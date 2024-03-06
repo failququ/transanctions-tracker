@@ -7,6 +7,6 @@ export class AppService {
   }
 
   getProfile(): string {
-    return 'profile!'
+    return 'profile!';
   }
 }
