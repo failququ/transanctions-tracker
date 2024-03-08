@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import { Repository } from 'typeorm';
 
@@ -10,6 +11,7 @@ import { User } from './entities/user.entity';
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    private jwtService: JwtService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -32,11 +34,14 @@ export class UserService {
       password: hashedPassword,
     });
 
-    console.log(isUserExist);
-    return { user };
+    const token = this.jwtService.sign({ email });
+
+    return { user, token };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(email: string) {
+    return await this.userRepository.findOne({
+      where: { email },
+    });
   }
 }
